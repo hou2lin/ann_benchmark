@@ -6,10 +6,11 @@ Verified under docker image `nvcr.io/nvidia/cuda:12.9.0-devel-ubuntu22.04`.
 
 ## prerequisites ##
 ```text
-cmake >= 3.31.8
+cmake >= 3.30.4
 ```
 
 ```shell
+#example
 wget https://github.com/Kitware/CMake/releases/download/v3.31.8/cmake-3.31.8-linux-x86_64.sh
 ./cmake-3.31.8-linux-x86_64.sh --prefix=/usr/local --exclude-subdir
 cmake --version 
