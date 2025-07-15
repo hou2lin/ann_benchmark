@@ -54,16 +54,16 @@ include(cmake/thirdparty/get_cuvs.cmake)
 #add_executable(test_ivf_pq src/test_ivf_pq.cu)
 #target_link_libraries(test_ivf_pq PRIVATE raft::raft raft::compiled)
 
-add_executable(test_ivf_flat_netease src/test_ivf_flat_netease.cu)
-target_link_libraries(test_ivf_flat_netease PRIVATE cuvs::cuvs)
+add_executable(test_ivf_flat_cuvs src/test_ivf_flat_cuvs.cu)
+target_link_libraries(test_ivf_flat_cuvs PRIVATE cuvs::cuvs)
 
-add_executable(test_ivf_pq_netease src/test_ivf_pq_netease.cu)
-target_link_libraries(test_ivf_pq_netease PRIVATE cuvs::cuvs)
+add_executable(test_ivf_pq_cuvs src/test_ivf_pq_cuvs.cu)
+target_link_libraries(test_ivf_pq_cuvs PRIVATE cuvs::cuvs)
 
-add_executable(test_cagra_netease src/test_cagra_netease.cu)
-target_link_libraries(test_cagra_netease PRIVATE cuvs::cuvs)
+add_executable(test_cagra_cuvs src/test_cagra_cuvs.cu)
+target_link_libraries(test_cagra_cuvs PRIVATE cuvs::cuvs)
 
-add_executable(test_vamana_netease src/test_vamana_netease.cu)
-target_link_libraries(test_vamana_netease PRIVATE cuvs::cuvs)
+add_executable(test_vamana_cuvs src/test_vamana_cuvs.cu)
+target_link_libraries(test_vamana_cuvs PRIVATE cuvs::cuvs)
 
 
