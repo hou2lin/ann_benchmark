@@ -15,9 +15,10 @@
  */
 
  #include <cstdint>
- #include <iostream>
- #include <algorithm>
- #include <cstdio>
+#include <iostream>
+#include <algorithm>
+#include <cstdio>
+#include <filesystem>
  
  #include <raft/random/rng.cuh>
  #include <raft/util/cuda_rt_essentials.hpp>
@@ -169,7 +170,6 @@ void dispatcher_raft_cagra(int64_t n_samples, int64_t n_dim, int64_t topk, int64
                                 sizeof(int64_t) * n_queries * topk,
                                 cudaMemcpyDefault)); // D2H copy GT result.
      
- 
      /* config index parameters */
      using namespace cuvs::neighbors;
      cagra::index_params index_params; //参数太多了,直接用默认参数
@@ -193,12 +193,14 @@ void dispatcher_raft_cagra(int64_t n_samples, int64_t n_dim, int64_t topk, int64
      std::cout << std::endl;
      cudaMemGetInfo(&freeMem, &totalMem); 
      printMem(freeMem, totalMem, "构建索引之后: ");
+     const std::string cagra_index_file = "cagra_index.bin";
+     cuvs::neighbors::cagra::serialize(dev_resources, cagra_index_file, index);
      /* config search parameters*/
-     cagra::search_params search_params;
+     cuvs::neighbors::cagra::search_params search_params;
      search_params.itopk_size = itopk_size;
      search_params.max_iterations = max_iterations;
      search_params.search_width = search_width;
-     //search_params.algo = cagra::search_algo::SINGLE_CTA
+     //search_params.algo = cuvs::neighbors::cagra::search_algo::SINGLE_CTA
      //search_params.n_probes = n_probes;
      
      /* search */
@@ -269,8 +271,8 @@ void dispatcher_raft_cagra(int64_t n_samples, int64_t n_dim, int64_t topk, int64
      UTIL::CommandLineParser parser(argc, argv);
      
      /* default hyper parameters */
-     int64_t n_samples = 1000000;      // number of samples of whole dataset
-     int64_t n_dim = 256;            // feature dimension
+     int64_t n_samples = 10000000;      // number of samples of whole dataset
+     int64_t n_dim = 768;            // feature dimension
      int64_t topk = 10;      
      int64_t n_queries = 10;         // number of queries
      //int64_t n_lists = 10000;          // number of inverted lists (clusters)

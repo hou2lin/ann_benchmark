@@ -15,9 +15,11 @@
  */
 
  #include <cstdint>
- #include <iostream>
- #include <algorithm>
- #include <cstdio>
+#include <iostream>
+#include <algorithm>
+#include <cstdio>
+#include <filesystem>
+#include <memory>
  
  #include <cuvs/neighbors/ivf_pq.hpp>
  #include <cuvs/neighbors/brute_force.hpp>
@@ -189,8 +191,10 @@ void dispatcher_raft_ivf_pq(int64_t n_samples, int64_t n_dim, int64_t topk, int6
      std::cout << std::endl;
      cudaMemGetInfo(&freeMem, &totalMem); 
      printMem(freeMem, totalMem, "构建索引之后: ");
+     const std::string ivf_pq_index_file = "ivf_pq_index.bin";
+     cuvs::neighbors::ivf_pq::serialize(dev_resources, ivf_pq_index_file, index);
      /* config search parameters*/
-     ivf_pq::search_params search_params;
+     cuvs::neighbors::ivf_pq::search_params search_params;
      search_params.n_probes = n_probes;
      
      /* search */
@@ -265,17 +269,18 @@ void dispatcher_raft_ivf_pq(int64_t n_samples, int64_t n_dim, int64_t topk, int6
      UTIL::CommandLineParser parser(argc, argv);
      
      /* default hyper parameters */
-     int64_t n_samples = 1000000;      // number of samples of whole dataset
-     int64_t n_dim = 256;            // feature dimension
+     int64_t n_samples = 7500000;      // number of samples of whole dataset
+     int64_t n_dim = 768;            // feature dimension
      int64_t topk = 10;      
      int64_t n_queries = 10;         // number of queries
      int64_t n_lists = 10000;          // number of inverted lists (clusters)
      int64_t n_probes = 2000;  
      int batch_size = 10;
-     int pq_dim = 64; //default is 64
+     int pq_dim = 256; //default is 64
      //int run_count = 1;
      std::string data_type = "";
      int if_read_exited_data = 0;
+     int force_rebuild_index = 0;  // Force rebuild index even if exists
      int split_bast_set_rows = 0;
      //bool dump_to_file = true;       // whether to save result to disk
 

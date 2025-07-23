@@ -15,9 +15,11 @@
  */
 
  #include <cstdint>
- #include <iostream>
- #include <algorithm>
- #include <cstdio>
+#include <iostream>
+#include <algorithm>
+#include <cstdio>
+#include <filesystem>
+#include <memory>
  
  #include <cuvs/neighbors/ivf_flat.hpp>
  #include <cuvs/neighbors/brute_force.hpp>
@@ -187,8 +189,10 @@ void dispatcher_raft_ivf(int64_t n_samples, int64_t n_dim, int64_t topk, int64_t
      std::cout << std::endl;
      cudaMemGetInfo(&freeMem, &totalMem); 
      printMem(freeMem, totalMem, "构建索引之后: ");
+     const std::string ivf_flat_index_file = "ivf_flat_index.bin";
+     cuvs::neighbors::ivf_flat::serialize(dev_resources, ivf_flat_index_file, index);
      /* config search parameters*/
-     ivf_flat::search_params search_params;
+     cuvs::neighbors::ivf_flat::search_params search_params;
      search_params.n_probes = n_probes;
      
      /* search */
@@ -223,7 +227,6 @@ void dispatcher_raft_ivf(int64_t n_samples, int64_t n_dim, int64_t topk, int64_t
         auto distances_batch = raft::make_device_matrix_view<float, int64_t>((result_distance.data_handle() + row * topk), actual_batch_size, topk);
         
         cuvs::neighbors::ivf_flat::search(dev_resources, search_params, index, queries_batch, neighbors_batch, distances_batch);
-        
         /*
         auto queries_v = raft::make_device_matrix_view<const float, int64_t>((queries.data_handle() + row * n_dim), actual_batch_size, n_dim);
         auto neighbors_v = raft::make_device_matrix_view<int64_t, int64_t>((result_ids.data_handle() + row * topk), actual_batch_size, topk);
@@ -271,8 +274,8 @@ void dispatcher_raft_ivf(int64_t n_samples, int64_t n_dim, int64_t topk, int64_t
      UTIL::CommandLineParser parser(argc, argv);
      
      /* default hyper parameters */
-     int64_t n_samples = 1000000;      // number of samples of whole dataset
-     int64_t n_dim = 256;            // feature dimension
+     int64_t n_samples = 7500000;      // number of samples of whole dataset
+     int64_t n_dim = 768;            // feature dimension
      int64_t topk = 10;      
      int64_t n_queries = 10;         // number of queries
      int64_t n_lists = 10000;          // number of inverted lists (clusters)
