@@ -37,7 +37,7 @@ run_test() {
     local num_threads="$6"
     
     local log_file="$LOG_DIR/${test_name}.log"
-    local cmd="$EXECUTABLE --num $N_SAMPLES --dim $N_DIM --topk $TOPK --queries $N_QUERIES --batch_size $BATCH_SIZE --graph_degree $graph_degree --visited_size $visited_size --max_fraction $alpha --vamana_iters $VAMANA_ITERS --search_width $l_search --itopk_size $ITOPK_SIZE --max_iterations $MAX_ITERATIONS --force_rebuild_index $FORCE_REBUILD_INDEX --diskann_l_search $DISKANN_L_SEARCH"
+    local cmd="$EXECUTABLE --num $N_SAMPLES --dim $N_DIM --topk $TOPK --queries $N_QUERIES --batch_size $BATCH_SIZE --graph_degree $graph_degree --visited_size $visited_size --max_fraction $alpha --vamana_iters $VAMANA_ITERS --search_width $l_search --itopk_size $ITOPK_SIZE --max_iterations $MAX_ITERATIONS --force_rebuild_index $FORCE_REBUILD_INDEX --diskann_l_search $DISKANN_L_SEARCH --force_rebuild_index 1"
     
     echo "[INFO] Running: $test_name"
     
@@ -49,8 +49,8 @@ run_test() {
     } | tee "$log_file"
     
     # Extract metrics
-    local qps=$(grep -o "qps is : [0-9.]*" "$log_file" | tail -1 | awk '{print $4}' || echo "N/A")
-    local recall=$(grep -o "recall_ratio_ret is : [0-9.]*" "$log_file" | tail -1 | awk '{print $4}' || echo "N/A")
+    local qps=$(grep -o "DiskANN QPS: [0-9.]*" "$log_file" | tail -1 | awk '{print $4}' || echo "N/A")
+    local recall=$(grep -o "Recall: [0-9.]*" "$log_file" | tail -1 | awk '{print $4}' || echo "N/A")
     
     # Save to CSV
     echo "$(date '+%Y-%m-%d %H:%M:%S'),$test_name,$graph_degree,$visited_size,$alpha,$l_search,$num_threads,$qps,$recall" >> "$RESULTS_FILE"
@@ -74,7 +74,7 @@ echo "[INFO] Running VAMANA base configurations..."
 # search: L_search=[10,20,30,40,50,100,200,300]
 # num_threads=[32]
 # Total: 2 * 2 * 1 * 8 * 1 = 32 tests
-for gd in 32 64; do
+for gd in 128; do #32 64
     for vs in 128 256; do
         for alpha in 0.4 0.6 1.0 1.2; do
             for l_search in 50 100 200 300; do
